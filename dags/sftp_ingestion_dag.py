@@ -31,19 +31,20 @@ from airflow import DAG
 
 # Operators; we need this to operate!
 from airflow.operators.bash import BashOperator
+from airflow.providers.sftp.operators.sftp import SFTPOperator
 
 # [END import_module]
 
 
 # [START instantiate_dag]
 with DAG(
-    'tutorial',
+    'SFTP-Hack-a-ton',
     # [START default_args]
     # These args will get passed on to each operator
     # You can override them on a per-task basis during operator initialization
     default_args={
         'depends_on_past': False,
-        'email': ['airflow@example.com'],
+        'email': ['ruud.cools@tennet.eu'],
         'email_on_failure': False,
         'email_on_retry': False,
         'retries': 1,
@@ -62,7 +63,7 @@ with DAG(
         # 'trigger_rule': 'all_success'
     },
     # [END default_args]
-    description='A simple tutorial DAG',
+    description='A dag that ingests a file from a sftp source',
     schedule_interval=timedelta(days=1),
     start_date=datetime(2021, 1, 1),
     catchup=False,
@@ -70,55 +71,15 @@ with DAG(
 ) as dag:
     # [END instantiate_dag]
 
-    # t1, t2 and t3 are examples of tasks created by instantiating operators
     # [START basic_task]
-    t1 = BashOperator(
-        task_id='print_date',
-        bash_command='date',
+    put_file = SFTPOperator(
+        task_id="test_sftp",
+        ssh_conn_id="sftp-hack-a-ton",
+        local_filepath="/tmp/file.txt",
+        remote_filepath="/tmp/tmp1/tmp2/file.txt",
+        operation="put",
+        create_intermediate_dirs=True,
+        dag=dag
     )
 
-    t2 = BashOperator(
-        task_id='sleep',
-        depends_on_past=False,
-        bash_command='sleep 5',
-        retries=3,
-    )
-    # [END basic_task]
-
-    # [START documentation]
-    t1.doc_md = dedent(
-        """\
-    #### Task Documentation
-    You can document your task using the attributes `doc_md` (markdown),
-    `doc` (plain text), `doc_rst`, `doc_json`, `doc_yaml` which gets
-    rendered in the UI's Task Instance Details page.
-    ![img](http://montcs.bloomu.edu/~bobmon/Semesters/2012-01/491/import%20soul.png)
-
-    """
-    )
-
-    dag.doc_md = __doc__  # providing that you have a docstring at the beginning of the DAG
-    dag.doc_md = """
-    This is a documentation placed anywhere
-    """  # otherwise, type it like this
-    # [END documentation]
-
-    # [START jinja_template]
-    templated_command = dedent(
-        """
-    {% for i in range(5) %}
-        echo "{{ ds }}"
-        echo "{{ macros.ds_add(ds, 7)}}"
-    {% endfor %}
-    """
-    )
-
-    t3 = BashOperator(
-        task_id='templated',
-        depends_on_past=False,
-        bash_command=templated_command,
-    )
-    # [END jinja_template]
-
-    t1 >> [t2, t3]
 # [END tutorial]

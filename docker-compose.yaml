@@ -266,5 +266,28 @@ services:
       airflow-init:
         condition: service_completed_successfully
 
+  sftp:
+    image: atmoz/sftp
+    volumes:
+      - ./tests/data/sftp/:/home/user/
+    ports:
+      - "2222:22"
+    command: user:password:1000
+
+  hadoop.local:
+    hostname: hadoop.local
+    image: nexus.cloud.local:449/tennet/common_baseimage_hadoop:R-6
+    environment:
+      - SKIP_DCOS_LOAD_BALANCER_HACK=1
+    ports:
+      - "21050:21050" #insecure
+      - "8020:8020"
+      - "9864:9864"
+      - "9866:9866"
+      - "9870:9870"  #insecure
+
+
+
+
 volumes:
   postgres-db-volume:

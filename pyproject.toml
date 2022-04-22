@@ -6,7 +6,8 @@ authors = ["Ruud Cools <ruud.cools@tennet.eu>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-apache-airflow = "^2.2.5"
+apache-airflow = {extras = ["celery"], version = "^2.2.5"}
+apache-airflow-providers-sftp = "^2.6.0"
 
 [tool.poetry.dev-dependencies]
 
