@@ -6,7 +6,7 @@ authors = ["Ruud Cools <ruud.cools@tennet.eu>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-airflow = "^0.6"
+apache-airflow = "^2.2.5"
 
 [tool.poetry.dev-dependencies]
 
