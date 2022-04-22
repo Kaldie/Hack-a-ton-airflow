@@ -30,7 +30,6 @@ from textwrap import dedent
 from airflow import DAG
 
 # Operators; we need this to operate!
-from airflow.operators.bash import BashOperator
 from airflow.providers.sftp.operators.sftp import SFTPOperator
 
 # [END import_module]
@@ -47,8 +46,8 @@ with DAG(
         'email': ['ruud.cools@tennet.eu'],
         'email_on_failure': False,
         'email_on_retry': False,
-        'retries': 1,
-        'retry_delay': timedelta(minutes=5),
+        'retries': 0,
+        # 'retry_delay': timedelta(minutes=5),
         # 'queue': 'bash_queue',
         # 'pool': 'backfill',
         # 'priority_weight': 10,
@@ -72,8 +71,18 @@ with DAG(
     # [END instantiate_dag]
 
     # [START basic_task]
+    get_file = SFTPOperator(
+        task_id="get_file",
+        ssh_conn_id="sftp-hack-a-ton",
+        local_filepath="/tmp/file.txt",
+        remote_filepath="/stuff.txt",
+        operation="get",
+        create_intermediate_dirs=True,
+        dag=dag
+    )
+
     put_file = SFTPOperator(
-        task_id="test_sftp",
+        task_id="put_file",
         ssh_conn_id="sftp-hack-a-ton",
         local_filepath="/tmp/file.txt",
         remote_filepath="/tmp/tmp1/tmp2/file.txt",
